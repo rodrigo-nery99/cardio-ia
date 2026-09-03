@@ -1,47 +1,37 @@
-import { classificarPressao } from '../utils/classificarPressao.js'
+import FormAfericao from '../components/FormAfericao.jsx'
+import ListaAfericoes from '../components/ListaAfericoes.jsx'
 
-function formatarData(iso) {
- return new Date(iso).toLocaleString('pt-BR', {
- dateStyle: 'short',
- timeStyle: 'short',
- })
-}
+export default function Afericoes({
+  paciente,
+  afericoes,
+  onSalvar,
+  onRemover,
+  onIrPacientes,
+}) {
+  if (!paciente) {
+    return (
+      <section className="painel">
+        <h2>Selecione um paciente</h2>
+        <p>
+          Cada medição precisa de um perfil. Sem isso, os dados de pessoas
+          diferentes se misturam de novo.
+        </p>
+        <button type="button" className="botao-principal" onClick={onIrPacientes}>
+          Ir para pacientes
+        </button>
+      </section>
+    )
+  }
 
-export default function ListaAfericoes({ afericoes, onRemover }) {
- if (afericoes.length === 0) {
- return (
- <p className="vazio">
- Nenhuma aferição nesta lista. Preencha o formulário acima.
- </p>
- )
- }
-
- return (
- <ul className="lista-afericoes">
- {afericoes.map((item) => {
- const classe = classificarPressao(item.sistolica, item.diastolica)
-
- return (
- <li key={item.id} className="card-afericao">
- <div>
- <p className="medida">
- {item.sistolica}/{item.diastolica}{' '}
- <span>mmHg</span>
- </p>
- <p className="meta">
- {formatarData(item.registradoEm)}
- {item.pulso ? ` · pulso ${item.pulso} bpm` : ''}
- </p>
- </div>
- <div className="acoes-card">
- <span className={`selo selo-${classe.nivel}`}>{classe.rotulo}</span>
- <button type="button" onClick={() => onRemover(item.id)}>
- Remover
- </button>
- </div>
- </li>
- )
- })}
- </ul>
- )
+  return (
+    <section className="painel">
+      <p className="hint">
+        Gravando em <strong>{paciente.nome}</strong>. Só as aferições deste
+        id aparecem no histórico abaixo.
+      </p>
+      <FormAfericao onSalvar={onSalvar} />
+      <h2>Histórico deste paciente</h2>
+      <ListaAfericoes afericoes={afericoes} onRemover={onRemover} />
+    </section>
+  )
 }
